@@ -3,13 +3,18 @@ pipeline{
     stages{
         stage('github validation'){
           steps{
-                 git url: 'https://github.com/akshu20791/addressbook-cicd-project'
+                 git url: 'https://github.com/Mahitha-Work/addressbook-cicd-project'
           }
         }
         stage('compiling the code'){
           steps{
                  sh 'mvn compile'
           }
+        }
+        stage('testing the code'){
+            steps{
+                sh 'mvn test'
+            }
         }
         
         stage('qa of the code'){
@@ -24,7 +29,7 @@ pipeline{
         }
         stage("deploy the project on tomcat"){
             steps{
-                sh "sudo mv /var/lib/jenkins/workspace/pipeline/target/addressbook.war /home/ubuntu/apache-tomcat-8.5.100/webapps/"
+                sh "sudo cp /var/lib/jenkins/workspace/git-webhook-address/target/addressbook.war /home/ubuntu/apache-tomcat-9.0.105/webapps"
             }
         }
     }
