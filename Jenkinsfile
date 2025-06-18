@@ -17,7 +17,7 @@ pipeline{
             }
         }
         
-        stage('qa of the code'){
+        stage('quality assurance of the code'){
             steps{
                 sh 'mvn pmd:pmd'
             }
