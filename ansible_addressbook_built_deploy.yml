@@ -1,0 +1,60 @@
+---
+- name: addressbook application
+  hosts: all
+  become: true
+
+  tasks:
+    - name: install java, maven and git
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - openjdk-21-jdk
+        - maven
+        - git
+
+    - name: git checkout
+      ansible.builtin.git:
+        repo: https://github.com/Mahitha-Work/addressbook-cicd-project-DKA.git
+        dest: /home/devops/addressbook-cicd-project-DKA
+        version: master # Optional: specify branch name
+        
+    - name: Remove a folder
+      ansible.builtin.file:
+         path: /home/devops/addressbook-cicd-project-DKA/target
+         state: absent
+    
+
+    - name: build the mvn project
+      ansible.builtin.shell: mvn clean package
+      args:
+        chdir: /home/devops/addressbook-cicd-project-DKA
+        
+    - name: install docker
+      ansible.builtin.package:
+       name: docker.io
+       state: present
+       update_cache: yes
+      
+    - name: start docker
+      ansible.builtin.service:
+       name: docker
+       state: started
+       enabled: true
+      
+    - name: Add devops user to docker group
+      ansible.builtin.user:
+       name: devops
+       groups: docker
+       append: yes
+
+    - name: Remove existing Docker container (if it exists)
+      ansible.builtin.shell: |
+       docker rm -f address || true
+      changed_when: false
+      ignore_errors: true
+   
+    - name: create the container from docker image
+      ansible.builtin.shell: |
+       docker run -itd --name address -p 9090:8080 mahithareddy/addressbook:latest
