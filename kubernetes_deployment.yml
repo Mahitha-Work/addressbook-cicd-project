@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cicdpod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: cicd1
+  template:
+    metadata:
+      labels:
+        name: cicd1
+    spec:
+      containers:
+        - name: addressbook-con
+          image: mahithareddy/addressbook:latest
+          ports:
+            - containerPort: 8080
